@@ -24,6 +24,20 @@ class User(db.Model):
     def __repr__(self):
         return '<Name %r>' % self.name
 
+class Listing(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200))
+    user = db.Column(db.String(60))
+    starting_price = db.Column(db.Numeric(2))
+
+    def __init__(self, title, user, starting_price):
+        self.title = title
+        self.user = user
+        self.starting_price = starting_price
+
+    def __repr__(self):
+        return '<Listing %s>' % (self.id)
+
 class Keys(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     key = db.Column(db.String(120), unique=True)
@@ -91,6 +105,20 @@ def get_user(name):
         return str(user.name)
     except:
         return 'Unexpected error'
+
+@app.route("/create/listing", methods=['POST'])
+@require_appkey
+def create_listing():
+    try:
+        title = request.form['title']
+        user = request.form['user']
+        starting_price = request.form['startingPrice']
+        listing = Listing(title=title, user=user, starting_price=starting_price)
+        addToDB(listing)
+    except:
+        return 'Unexpected error'
+
+    return 'Success'
 
 if __name__ == "__main__":
     app.run(port=8080)
