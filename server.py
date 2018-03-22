@@ -120,5 +120,9 @@ def create_listing():
 
     return 'Success'
 
+@app.route("/test")
+def test():
+    return 'Server is up and functional.'
+
 if __name__ == "__main__":
     app.run(port=8080)
