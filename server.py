@@ -11,7 +11,7 @@ CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
-version = '1.0.0'
+version = '1.0.1'
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
