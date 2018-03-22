@@ -60,6 +60,10 @@ def generate_hash_key():
     return base64.b64encode(hashlib.sha256(str(random.getrandbits(256))).digest(),
                             random.choice(['rA', 'aZ', 'gQ', 'hH', 'hG', 'aR', 'DD'])).rstrip('==')
 
+def create_and_store_key():
+    key = Keys(generate_hash_key())
+    addToDB(key)
+
 # The actual decorator function
 def require_appkey(view_function):
     @wraps(view_function)
