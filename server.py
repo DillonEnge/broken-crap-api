@@ -11,7 +11,7 @@ CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
-version = '1.0.1'
+version = '1.0.2'
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -109,6 +109,20 @@ def get_user(name):
         if not user:
             return 'User:%r not found' % (name)
         return str(user.name)
+    except:
+        return 'Unexpected error'
+
+@app.route("/validate_login", methods=['POST'])
+@require_appkey
+def validate_login():
+    try:
+        name = request.form['name']
+        password = request.form['password']
+        user = User.query.filter_by(name=name).first()
+        if not user:
+            return 'User: %r not found' % (name)
+        elif user.name == name and user.password == password:
+            return 'success'
     except:
         return 'Unexpected error'
 
