@@ -11,6 +11,7 @@ CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
+version = '1.0.0'
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -127,7 +128,7 @@ def create_listing():
 
 @app.route("/test")
 def test():
-    return 'Server is up and functional.'
+    return 'Server is up and functional. Version ' + version
 
 if __name__ == "__main__":
     app.run(port=8080)
