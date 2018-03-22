@@ -64,7 +64,7 @@ def generate_hash_key():
 def create_and_store_key():
     key = Keys(generate_hash_key())
     addToDB(key)
-    print(key)
+    print(key.key)
 
 # The actual decorator function
 def require_appkey(view_function):
