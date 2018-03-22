@@ -14,12 +14,12 @@ db = SQLAlchemy(app)
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(60))
-    email = db.Column(db.String(120), unique=True)
+    name = db.Column(db.String(60), unique=True)
+    password = db.Column(db.String(120))
 
-    def __init__(self, name, email):
+    def __init__(self, name, password):
         self.name = name
-        self.email = email
+        self.password = password
 
     def __repr__(self):
         return '<Name %r>' % self.name
