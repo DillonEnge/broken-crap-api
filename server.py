@@ -30,7 +30,7 @@ class Listing(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user = db.Column(db.String(60))
     title = db.Column(db.String(200))
-    description = db.Column(db.String(500))
+    description = db.Column(db.String())
     starting_price = db.Column(db.Numeric(2))
     time_created = db.Column(db.DateTime(), default=datetime.utcnow)
 
