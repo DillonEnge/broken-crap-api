@@ -150,7 +150,7 @@ def create_listing():
         print(e)
         abort(500)
 
-    print("Listing \"" + request.form['title'] + "\" created at " + datetime.now())
+    print("Listing \"" + request.form['title'] + "\" created!")
 
     return 'Success'
 
