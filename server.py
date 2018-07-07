@@ -1,6 +1,7 @@
 # server.py
 import os, random, requests
 import base64, hashlib
+from datetime import datetime
 from functools import wraps
 from flask import Flask, render_template, request, abort
 from flask_cors import CORS
@@ -31,14 +32,13 @@ class Listing(db.Model):
     title = db.Column(db.String(200))
     description = db.Column(db.String(500))
     starting_price = db.Column(db.Numeric(2))
-    time_created = db.Column(db.DateTime())
+    time_created = db.Column(db.DateTime(), default=datetime.utcnow)
 
-    def __init__(self, user, title, description, starting_price, time_created):
+    def __init__(self, user, title, description, starting_price):
         self.user = user
         self.title = title
         self.description = description
         self.starting_price = starting_price
-        self.time_created = time_created
 
     def __repr__(self):
         return '<Listing %s>' % (self.id)
@@ -95,7 +95,7 @@ def create_user():
             addToDB(user)
             return "success"
     except:
-        return "Unexpected error"
+        abort(500)
 
     return 'Success'
 
@@ -107,7 +107,7 @@ def delete_user():
         user = User.query.filter_by(name=name).first()
         deleteFromDB(user)
     except:
-        return "Unexpected error"
+        abort(500)
 
     return 'Success'
 
@@ -119,7 +119,7 @@ def get_user(name):
             return 'User:%r not found' % (name)
         return str(user.name)
     except:
-        return 'Unexpected error'
+        abort(500)
 
 @app.route("/validate_login", methods=['POST'])
 @require_appkey
@@ -134,7 +134,7 @@ def validate_login():
             return 'success'
         return 'Incorrect Password'
     except:
-        return 'Unexpected error'
+        abort(500)
 
 @app.route("/create/listing", methods=['POST'])
 @require_appkey
@@ -144,11 +144,24 @@ def create_listing():
         user = request.form['user']
         description = request.form['description']
         starting_price = request.form['startingPrice']
-        time_created = request.form['timeCreated']
-        listing = Listing(user=user, title=title, description=description, starting_price=starting_price, time_created=time_created, )
+        listing = Listing(user=user, title=title, description=description, starting_price=starting_price)
         addToDB(listing)
+    except Exception as e:
+        print(e)
+        abort(500)
+
+    print("Listing \"" + request.form['title'] + "\" created at " + datetime.now())
+
+    return 'Success'
+
+@app.route("/get/listings/<user>", methods=['GET'])
+@require_appkey
+def get_user_listings():
+    try:
+        listings = Listing.query.filter_by(user=user).all()
+        return listings
     except:
-        return 'Unexpected error'
+        abort(500)
 
     return 'Success'
 
@@ -158,3 +171,4 @@ def test():
 
 if __name__ == "__main__":
     app.run(port=8080)
+    app.debug = True
