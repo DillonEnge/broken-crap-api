@@ -27,14 +27,18 @@ class User(db.Model):
 
 class Listing(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200))
     user = db.Column(db.String(60))
+    title = db.Column(db.String(200))
+    description = db.Column(db.String(500))
     starting_price = db.Column(db.Numeric(2))
+    time_created = db.Column(db.DateTime())
 
-    def __init__(self, title, user, starting_price):
-        self.title = title
+    def __init__(self, user, title, description, starting_price, time_created):
         self.user = user
+        self.title = title
+        self.description = description
         self.starting_price = starting_price
+        self.time_created = time_created
 
     def __repr__(self):
         return '<Listing %s>' % (self.id)
@@ -83,8 +87,13 @@ def create_user():
     try:
         name = request.form['name']
         password = request.form['password']
-        user = User(name=name, password=password)
-        addToDB(user)
+        userExists = User.query.filter_by(name=name).first()
+        if userExists:
+            return "Username taken"
+        else:
+            user = User(name=name, password=password)
+            addToDB(user)
+            return "success"
     except:
         return "Unexpected error"
 
@@ -133,15 +142,17 @@ def create_listing():
     try:
         title = request.form['title']
         user = request.form['user']
+        description = request.form['description']
         starting_price = request.form['startingPrice']
-        listing = Listing(title=title, user=user, starting_price=starting_price)
+        time_created = request.form['timeCreated']
+        listing = Listing(user=user, title=title, description=description, starting_price=starting_price, time_created=time_created, )
         addToDB(listing)
     except:
         return 'Unexpected error'
 
     return 'Success'
 
-@app.route("/test")
+@app.route("/health")
 def test():
     return 'Server is up and functional. Version ' + version
 
