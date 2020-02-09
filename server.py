@@ -6,10 +6,13 @@ from functools import wraps
 from flask import Flask, render_template, request, abort
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
+from dotenv import load_dotenv, find_dotenv
+from cryptography.fernet import Fernet
+load_dotenv(find_dotenv())
 
 app = Flask(__name__, static_folder="../static/dist", template_folder="../static")
 CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 db = SQLAlchemy(app)
 version = '1.0.5'
@@ -61,12 +64,14 @@ def deleteFromDB(obj):
     db.session.delete(obj)
     db.session.commit()
 
-def generate_hash_key():
-    return base64.b64encode(hashlib.sha256(str(random.getrandbits(256))).digest(),
-                            random.choice(['rA', 'aZ', 'gQ', 'hH', 'hG', 'aR', 'DD'])).rstrip('==')
+def generate_key():
+    return Fernet.generate_key()
 
-def create_and_store_key():
-    key = Keys(generate_hash_key())
+def create_and_store_key(key_phrase):
+    generated_key = generate_key()
+    cipher_suite = Fernet(generated_key)
+    encrypted_key = str(cipher_suite.encrypt(bytes(key_phrase, encoding='utf-8')))
+    key = Keys(encrypted_key)
     addToDB(key)
     print(key.key)
 
